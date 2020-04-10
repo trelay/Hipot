@@ -41,8 +41,17 @@ input_xml='''
 <Import><Barcode>{0}</Barcode><Process>{1}</Process><Site>MP1</Site>
 <CheckType>EnterStation</CheckType></Import></GetProcessStatus>
 '''
+sub_xml = '''
+<?xml version="1.0" encoding="UTF-8"?><SubmitATETestResult><Import><TaskOrder></TaskOrder><Barcode>{0}</Barcode>
+<StartDateTime>{1}</StartDateTime><StopDateTime>{2}</StopDateTime><TestResult>{3}</TestResult>
+<ATEName>ST-SmarX8500A0125</ATEName><ATEVer>ITESTINSIDE-1.045-1.000</ATEVer><ATEDesc></ATEDesc><UUTName></UUTName><TPSName></TPSName>
+<TPSVer></TPSVer><TPSProduct></TPSProduct><TPSProductLine></TPSProductLine><LineCode></LineCode><ProcessCode>ST</ProcessCode><SiteCode>{4}</SiteCode>
+<FailDesc></FailDesc><TestBy>kdzb</TestBy></Import></SubmitATETestResult>
+'''
+
 station_name = "EST-MP1"
 inf_name = "GetProcessStatus"
+sub_name = "SubmitATETestResult"
 
 def test_import(input_xml,inf_name):
     input_xml = input_xml.replace("\n","")
@@ -113,17 +122,28 @@ if __name__=="__main__":
         start_t = strftime("%Y-%m-%d %H:%M:%S", localtime())
         print(start_t)
         hi_instrument.write("SAFE:STAR")
-        sleep(20)
+        sleep(17)
 
         ######### check result#####
         test_result = hi_instrument.query('SAFE:RES:ALL?')
+        end_t = strftime("%Y-%m-%d %H:%M:%S", localtime())
         print(test_result)
         if '116,116,116' not in test_result:
             print(FAIL)
+            hi_result = "1"
             fl_nm = 'sn_fail.txt'
         else:
             print(PASS)
+            hi_result = "0"
             fl_nm = 'sn_pass.txt'
+
+        ###### submit test result ######    
+        subATE_xml = sub_xml.format(SN,start_t,end_t,hi_result,station_name)
+        output_xml = test_import(subATE_xml,sub_name)
+        if '''ErrorCode>0''' not in output_xml:
+            print(u'不能上传安规测试记录')
+            print(FAIL)
+            print(u'不能上传安规测试记录')
 
         ######### save log for tracking #####
         log_msg = "{0}\t\t{1}\n".format(start_t,SN)
@@ -134,3 +154,4 @@ if __name__=="__main__":
         clean_hi(hi_instrument)
         ###### Better to close it for next round of test###
         hi_instrument.close()
+        
