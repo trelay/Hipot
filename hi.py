@@ -130,11 +130,11 @@ if __name__=="__main__":
         print(test_result)
         if '116,116,116' not in test_result:
             print(FAIL)
-            hi_result = "1"
+            hi_result = "0"
             fl_nm = 'sn_fail.txt'
         else:
             print(PASS)
-            hi_result = "0"
+            hi_result = "1"
             fl_nm = 'sn_pass.txt'
 
         ###### submit test result ######    
