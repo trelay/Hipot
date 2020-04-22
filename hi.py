@@ -36,7 +36,7 @@ FAIL="""
         F               A                   A            I          LLLLLLLLLLLL
 """
 
-input_xml='''
+check_xml='''
 <?xml version="1.0" encoding="UTF-8"?><GetProcessStatus>
 <Import><Barcode>{0}</Barcode><Process>{1}</Process><Site>MP1</Site>
 <CheckType>EnterStation</CheckType></Import></GetProcessStatus>
@@ -50,7 +50,7 @@ sub_xml = '''
 '''
 
 station_name = "EST-MP1"
-inf_name = "GetProcessStatus"
+check_name = "GetProcessStatus"
 sub_name = "SubmitATETestResult"
 
 def test_import(input_xml,inf_name):
@@ -102,8 +102,8 @@ if __name__=="__main__":
                 break
 
         ###### check station######    
-        inport_xml = input_xml.format(SN, station_name)
-        output_xml = test_import(inport_xml,inf_name)
+        check_station_xml = check_xml.format(SN, station_name)
+        output_xml = test_import(check_station_xml,check_name)
         if '''StatusValue="1"''' not in output_xml:
             print(u'测试站位错误，这个整机不能测试安规')
             continue
@@ -154,4 +154,3 @@ if __name__=="__main__":
         clean_hi(hi_instrument)
         ###### Better to close it for next round of test###
         hi_instrument.close()
-        
